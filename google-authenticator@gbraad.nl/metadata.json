@@ -1,0 +1,7 @@
+{
+    "shell-version": ["3.4"],
+    "uuid": "google-authenticator@gbraad.nl",
+    "name": "Google Authenticator",
+    "description": "A simple Google Authenticator exension",
+    "url": "https://github.com/gbraad/gnome-shell-google-authenticator"
+}
