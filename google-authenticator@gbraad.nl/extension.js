@@ -44,7 +44,7 @@ const Indicator = new Lang.Class({
     Extends: PanelMenu.SystemStatusButton,
 
     _init: function() {
-        this.parent("");
+        this.parent("google-authenticator");
         
         // Set default values of options, and then override from config file
         this._parseConfig();
@@ -73,13 +73,17 @@ const Indicator = new Lang.Class({
     // Update the keys based on timer tick
     _updateTimer: function() {
 	// Should indicate the countdown time and only update when needed
-        //let epoch = Math.round(new Date().getTime() / 1000.0);
-        //let countDown = 30 - (epoch % 30);
+        let epoch = Math.round(new Date().getTime() / 1000.0);
+        let countDown = 30 - (epoch % 30);
 	// If we need to update the OTP keys
-        //if (epoch % 30 == 0) {
-        //    Totp.updateOtp(_keySecret);
-	let key = Totp.updateOtp("JBSWY3DPEHPK3PXP");
-        //}
+        if (epoch % 30 == 0) {
+		// Reset
+		this.menu.removeAll();
+
+        	//Totp.updateOtp(_keySecret);
+		let key = Totp.updateOtp("JBSWY3DPEHPK3PXP");
+		this.menu.addMenuItem(new PopupMenu.PopupMenuItem(key));
+        }
 
         // Weird way to show 2-digit number, but js doesn't have a native padding function
         //if (countDown < 10) 
@@ -87,11 +91,6 @@ const Indicator = new Lang.Class({
         //else
         //    countDown = countDown.toString();
         // "[" + countDown + "]";
-
-	// Reset
-	this.menu.removeAll();
-
-	this.menu.addMenuItem(new PopupMenu.PopupMenuItem(key));
     },
 
     _parseConfig: function() {
