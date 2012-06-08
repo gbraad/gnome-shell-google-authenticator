@@ -44,7 +44,7 @@ const Indicator = new Lang.Class({
     Extends: PanelMenu.SystemStatusButton,
 
     _init: function() {
-        this.parent("google-authenticator");
+        this.parent("changes-prevent");
         
         // Set default values of options, and then override from config file
         this._parseConfig();
@@ -58,18 +58,6 @@ const Indicator = new Lang.Class({
         //this.connect('destroy', Lang.bind(this, this._onDestroy));
     },
 
-    // Notify user of changes
-    _notifyUser: function(text, label_msg) {
-        let source = new MessageTray.SystemNotificationSource();
-        Main.messageTray.add(source);
-        let notification = new MessageTray.Notification(source, text, null);
-        notification.setTransient(true);
-        source.notify(notification);
-
-        // Change the label inside the popup menu
-        this._labelMsg.set_text(label_msg);
-    },
-
     // Update the keys based on timer tick
     _updateTimer: function() {
 	// Should indicate the countdown time and only update when needed
@@ -80,8 +68,9 @@ const Indicator = new Lang.Class({
 		// Reset
 		this.menu.removeAll();
 
+		this.menu.addMenuItem(new PopupMenu.PopupMenuItem(this._keyAccount));
         	//Totp.updateOtp(_keySecret);
-		let key = Totp.updateOtp("JBSWY3DPEHPK3PXP");
+		let key = Totp.updateOtp(this._keySecret);
 		this.menu.addMenuItem(new PopupMenu.PopupMenuItem(key));
         }
 
