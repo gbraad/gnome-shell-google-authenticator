@@ -55,7 +55,7 @@ const Indicator = new Lang.Class({
 		return true;
 	}));
 
-        //this.connect('destroy', Lang.bind(this, this._onDestroy));
+        this.connect('destroy', Lang.bind(this, this._onDestroy));
     },
 
     // Update the keys based on timer tick
@@ -69,7 +69,6 @@ const Indicator = new Lang.Class({
 		this.menu.removeAll();
 
 		this.menu.addMenuItem(new PopupMenu.PopupMenuItem(this._keyAccount));
-        	//Totp.updateOtp(_keySecret);
 		let key = Totp.updateOtp(this._keySecret);
 		this.menu.addMenuItem(new PopupMenu.PopupMenuItem(key));
         }
@@ -89,6 +88,7 @@ const Indicator = new Lang.Class({
         for (let i = 0; i < _configOptions.length; i++)
             this[_configOptions[i][0]] = _configOptions[i][3];
 
+	// Read configuration file
         if (GLib.file_test(_configFile, GLib.FileTest.EXISTS)) {
             let filedata = null;
 
