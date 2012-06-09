@@ -34,9 +34,8 @@ const Totp = Extension.imports.totp;
 //const _ = Gettext.gettext;
 //const ngettext = Gettext.ngettext;
 
-let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <default_value> ]
-    ["_keyAccount",	"key",	"account",	"alice@google.com"],
-    ["_keySecret",	"key",	"secret",	"JBSWY3DPEHPK3PXP"]
+let _accounts = [
+    { "name":	"alice@google.com", "secret" : "JBSWY3DPEHPK3PXP"}
 ];
 
 const Indicator = new Lang.Class({
@@ -82,43 +81,7 @@ const Indicator = new Lang.Class({
     },
 
     _parseConfig: function() {
-        let _configFile = GLib.get_home_dir() + "/.gnome_shell_google-authenticator.json";
 
-        // Set the default values
-        for (let i = 0; i < _configOptions.length; i++)
-            this[_configOptions[i][0]] = _configOptions[i][3];
-
-	// Read configuration file
-        if (GLib.file_test(_configFile, GLib.FileTest.EXISTS)) {
-            let filedata = null;
-
-            try {
-                filedata = GLib.file_get_contents(_configFile, null, 0);
-                global.log("Google Authenticator: Using config file = " + _configFile);
-
-                let jsondata = eval("(" + filedata[1] + ")");
-                let parserVersion = null;
-                if (jsondata.hasOwnProperty("version"))
-                    parserVersion = jsondata.version;
-                else
-                    throw "Parser version not defined";
-
-                for (let i = 0; i < _configOptions.length; i++) {
-                    let option = _configOptions[i];
-                    if (jsondata.hasOwnProperty(option[1]) && jsondata[option[1]].hasOwnProperty(option[2])) {
-                        // The option "category" and the actual option is defined in config file,
-                        // override it!
-                        this[option[0]] = jsondata[option[1]][option[2]];
-                    }
-                }
-            }
-            catch (e) {
-                global.logError("Google Authenticator: Error reading config file = " + e);
-            }
-            finally {
-                filedata = null;
-            }
-        }
     },
 
     _onDestroy: function() {
