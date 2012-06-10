@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schemalist>
+	<schema path="/org/gnome/shell/extensions/google-authenticator/" id="org.gnome.shell.extensions.google-authenticator" >
+		<key type="as" name="accounts">
+			<default><![CDATA[[ ]]]></default>
+			<summary>Accounts</summary>
+		</key>
+	</schema>
+</schemalist>
