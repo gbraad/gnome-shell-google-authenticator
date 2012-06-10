@@ -18,73 +18,128 @@ const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 
 const St = imports.gi.St;
-const Pango = imports.gi.Pango;
-const GLib = imports.gi.GLib;
 
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
-const Tweener = imports.ui.tweener;
-
+//const Tweener = imports.ui.tweener;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Totp = Extension.imports.totp;
+const Convenience = Extension.imports.convenience;
 
-//const Gettext = imports.gettext.domain('gnome-shell-google-authenticator');
-//const _ = Gettext.gettext;
-//const ngettext = Gettext.ngettext;
-
-let _accounts = [
-    { "name":	"alice@google.com", "secret" : "JBSWY3DPEHPK3PXP"}
-];
+let _settings;
+//const SETTINGS_ACCOUNTS_KEY = 'accounts';
+let _accounts;
+let _defaultAccounts = [{
+    "name": "alice@google.com",
+    "secret": "JBSWY3DPEHPK3PXP"
+}, {
+    "name": "alice+again@google.com",
+    "secret": "JBSWY3DPEHPK3PXP"
+}];
 
 const Indicator = new Lang.Class({
-    Name : 'GoogleAuthenticator',
+    Name: 'GoogleAuthenticator',
     Extends: PanelMenu.SystemStatusButton,
 
-    _init: function() {
+    _init: function () {
         this.parent("changes-prevent");
-        
-        // Set default values of options, and then override from config file
-        this._parseConfig();
+        this._parseSettings();
 
-	// This should occur every second
-        this._timeout = Mainloop.timeout_add_seconds(1, Lang.bind(this, function() {
-		this._updateTimer()
-		return true;
-	}));
-
-        this.connect('destroy', Lang.bind(this, this._onDestroy));
+        // This should occur every second
+        this._timeout = Mainloop.timeout_add_seconds(1, Lang.bind(this, function () {
+            this._updateTimer()
+            return true;
+        }));
+        this._updateTimer(true)
     },
 
-    // Update the keys based on timer tick
-    _updateTimer: function() {
-	// Should indicate the countdown time and only update when needed
+    // Update the keys based on timer tick or forced
+    _updateTimer: function (force) {
+        // Should indicate the countdown time and only update when needed
         let epoch = Math.round(new Date().getTime() / 1000.0);
         let countDown = 30 - (epoch % 30);
-	// If we need to update the OTP keys
-        if (epoch % 30 == 0) {
-		// Reset
-		this.menu.removeAll();
 
-		this.menu.addMenuItem(new PopupMenu.PopupMenuItem(this._keyAccount));
-		let key = Totp.updateOtp(this._keySecret);
-		this.menu.addMenuItem(new PopupMenu.PopupMenuItem(key));
+        // If we need to update the OTP keys
+        if (force || epoch % 30 == 0) {
+            // Reset
+            this.menu.removeAll();
+
+            for (let i = 0; i < _accounts.length; i++) {
+                let account = _accounts[i];
+                let index = i; // have to store local?	
+                let key = Totp.updateOtp(account.secret);
+
+                let accountMenu = new PopupMenu.PopupMenuItem(account.name + "\n" + key);
+                /*
+			let delButton = new St.Bin({reactive: true,
+	                          can_focus: true,
+	                          x_fill: true,
+	                          y_fill: false,
+				  track_hover: true });
+	                let delIcon = new St.Icon({icon_name: 'edit-delete',
+				icon_type: St.IconType.SYMBOLIC,
+				icon_size: Main.panel.actor.height * 0.8});
+			delButton.set_child(delIcon);
+			delButton.connect('button-press-event', Lang.bind(this, function() { this._delAccount(index); }));
+	                accountMenu.addActor(delButton, {align: St.Align.END});
+			*/
+                this.menu.addMenuItem(accountMenu);
+            }
+
+            //this._menuElements();
         }
-
-        // Weird way to show 2-digit number, but js doesn't have a native padding function
-        //if (countDown < 10) 
-        //    countDown = "0" + countDown.toString();
-        //else
-        //    countDown = countDown.toString();
-        // "[" + countDown + "]";
     },
 
-    _parseConfig: function() {
-
+    _menuElements: function () {
+        // Need to find a convenient way to update only the elements itself
+        let addMenu = new PopupMenu.PopupMenuItem("Settings");
+        let addButton = new St.Bin({
+            reactive: true,
+            can_focus: true,
+            x_fill: true,
+            y_fill: false,
+            track_hover: true
+        });
+        let addIcon = new St.Icon({
+            icon_name: 'list-add',
+            icon_type: St.IconType.SYMBOLIC,
+            icon_size: Main.panel.actor.height * 0.8
+        });
+        addButton.set_child(addIcon);
+        addButton.connect('button-press-event', Lang.bind(this, function () {
+            this._addAccount();
+        }));
+        addMenu.addActor(addButton, {
+            align: St.Align.END
+        });
+        this.menu.addMenuItem(addMenu);
     },
 
-    _onDestroy: function() {
+    _delAccount: function (index) {
+        //_accounts.splice(index, 1);
+        //_settings.set_strv(SETTINGS_ACCOUNTS_KEY, _accounts);
+        this._updateTimer(true);
+    },
+
+    _addAccount: function () {},
+
+    _parseSettings: function () {
+        // TODO: deal with gsettings and keyring
+        _acounts = null;
+        _settings = Convenience.getSettings();
+        try {
+            // TODO: parse account information 
+            //_accounts = _settings.get_string(SETTINGS_ACCOUNTS_KEY);
+        } catch (e) {
+            global.logError("Google Authenticator: Error reading configuration = " + e);
+        } finally {
+            if (!_accounts) {
+                _accounts = _defaultAccounts;
+                //_settings.set_strv(SETTINGS_ACCOUNTS_KEY, _accounts);
+            }
+        }
     }
 
 });
@@ -92,6 +147,7 @@ const Indicator = new Lang.Class({
 let indicator;
 
 function init(metadata) {
+    //Convenience.initTranslations();
 }
 
 function enable() {

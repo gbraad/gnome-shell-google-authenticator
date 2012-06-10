@@ -1,7 +1,11 @@
 {
     "shell-version": ["3.4"],
+    "settings-schema": "org.gnome.shell.extensions.google-authenticator",
+    "gettext-domain": "gnome-shell-extensions",
+    "extension-id": "google-authenticator",
     "uuid": "google-authenticator@gbraad.nl",
     "name": "Google Authenticator",
     "description": "A simple Google Authenticator exension",
-    "url": "https://github.com/gbraad/gnome-shell-google-authenticator"
+    "url": "https://github.com/gbraad/gnome-shell-google-authenticator",
+    "original-authors": [ "me@gbraad.nl" ]
 }

@@ -200,12 +200,7 @@ jsSHA.prototype = {
     }
 };
 
-// Mock/stub code
-//jsSHA = function (srcString, inputFormat) { /* ignore input */ }
-//jsSHA.prototype = {
-//    getHMAC : function (key, inputFormat, variant, outputFormat) { return "JUSTATEST"; }
-//}
-
+// Based on the JavaScript implementation as provided by Tin Isles:
 // http://blog.tinisles.com/2011/10/google-authenticator-one-time-password-algorithm-in-javascript/
 
 function dec2hex(s) {
@@ -265,5 +260,5 @@ function updateOtp(secret) {
     //var part3 = hmac.substr(offset * 2 + 8, hmac.length - offset);
 
     let otp = (hex2dec(hmac.substr(offset * 2, 8)) & hex2dec('7fffffff')) + '';
-    return "" + (otp).substr(otp.length - 6, 6);
+    return (otp).substr(otp.length - 6, 6).toString();
 }

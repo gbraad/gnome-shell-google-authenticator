@@ -1,1 +1,9 @@
-Based on the JavaScript implementation as provided by Tin Isles: http://blog.tinisles.com/2011/10/google-authenticator-one-time-password-algorithm-in-javascript/
+A simple Gnome-shell extension for Google Authenticator
+
+Supports showing multiple accounts, but at the moment you need to configure it by editing the extension.js
+
+TODO:
+ * implementing configuration/preferences widget
+ * show countdown
+ * store secrets in keyring
+
